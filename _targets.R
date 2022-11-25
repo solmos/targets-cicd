@@ -17,7 +17,7 @@ for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 data_input_targets <- tar_plan(
   ## Example data input target/s; delete and replace with your own data input
   ## targets
-  nutrition_data = zscorer::anthro2
+  mtcars_raw = mtcars
 )
 
 
@@ -25,11 +25,7 @@ data_input_targets <- tar_plan(
 data_processing_targets <- tar_plan(
   ## Example data processing target/s; delete and replace with your own data
   ## processing targets
-  nutrition_data_check = check_anthro_data(df = nutrition_data),
-  nutrition_data_issues = check_anthro_data(
-    df = nutrition_data, output = "check"
-  ),
-  nutrition_data_clean = nutrition_data_check |> filter(flag != 0)
+  mtcars_clean = mtcars_raw |> mutate(mpg_rounded = round(mpg))
 )
 
 
@@ -37,10 +33,7 @@ data_processing_targets <- tar_plan(
 analysis_targets <- tar_plan(
   ## Example analysis target/s; delete and replace with your own analysis
   ## targets
-  wasting_recode = find_child_wasting(
-    df = nutrition_data_clean, index = "whz", zscore = "wfhz"
-  ),
-  wasting_prevalence = sum(wasting_recode[["wfhz"]], na.rm = TRUE) / nrow(wasting_recode)
+  model_mtcars = lm(mpg_rounded ~ hp, data = mtcars_clean)
 )
 
 ## Outputs
@@ -62,27 +55,27 @@ report_targets <- tar_plan(
 )
 
 ## Deploy targets
-deploy_targets <- tar_plan(
-  ## This is a placeholder for any targets that are meant to deploy reports or
-  ## any outputs externally e.g., website, Google Cloud Storage, Amazon Web
-  ## Services buckets, etc. Delete or keep empty if you will not perform any
-  ## deployments. The aws_s3_upload function requires AWS credentials to be loaded
-  ## but will print a warning and do nothing if not
+# deploy_targets <- tar_plan(
+#   ## This is a placeholder for any targets that are meant to deploy reports or
+#   ## any outputs externally e.g., website, Google Cloud Storage, Amazon Web
+#   ## Services buckets, etc. Delete or keep empty if you will not perform any
+#   ## deployments. The aws_s3_upload function requires AWS credentials to be loaded
+#   ## but will print a warning and do nothing if not
   
-  html_files = containerTemplateUtils::get_file_paths(tar_obj = example_report,
-                                                      pattern = "\\.html$"),
-  uploaded_report = containerTemplateUtils::aws_s3_upload(html_files,
-                                                        bucket = Sys.getenv("AWS_BUCKET"),
-                                                        error = FALSE,
-                                                        file_type = "html"),
-  # email_updates= 
-  #   containerTemplateUtils::send_email_update(
-  #     to = strsplit(Sys.getenv("EMAIL_RECIPIENTS"),";")[[1]],
-  #     from = Sys.getenv("EMAIL_SENDER"),
-  #     project_name = "My Project",
-  #     attach = TRUE
-  #   )
-)
+#   html_files = containerTemplateUtils::get_file_paths(tar_obj = example_report,
+#                                                       pattern = "\\.html$"),
+#   uploaded_report = containerTemplateUtils::aws_s3_upload(html_files,
+#                                                         bucket = Sys.getenv("AWS_BUCKET"),
+#                                                         error = FALSE,
+#                                                         file_type = "html"),
+#   # email_updates= 
+#   #   containerTemplateUtils::send_email_update(
+#   #     to = strsplit(Sys.getenv("EMAIL_RECIPIENTS"),";")[[1]],
+#   #     from = Sys.getenv("EMAIL_SENDER"),
+#   #     project_name = "My Project",
+#   #     attach = TRUE
+#   #   )
+# )
 
 # List targets -----------------------------------------------------------------
 
@@ -91,6 +84,6 @@ list(
   data_processing_targets,
   analysis_targets,
   outputs_targets,
-  report_targets,
-  deploy_targets
+  report_targets
+  # deploy_targets
 )

@@ -1,6 +1,6 @@
 ---
 title: "Example Rmarkdown Report"
-author: "EcoHealth Alliance"
+author: "Sergio"
 date: "Produced on `r Sys.Date()`"
 output:
   html_document:
@@ -19,19 +19,9 @@ knitr::opts_chunk$set(
   fig.path = "figures/"
 )
 
+library(dplyr)
 
-library(zscorer)
-library(nipnTK)
-library(nutricheckr)
-
-targets::tar_load(
-  c(nutrition_data, 
-    nutrition_data_check,
-    nutrition_data_issues,
-    nutrition_data_clean, 
-    wasting_recode, 
-    wasting_prevalence)
-)
+targets::tar_load(c(mtcars_clean, model_mtcars))
 ```
 
 This is an example `Rmarkdown` report produced through a workflow built on the `targets` framework, made portable using `renv`, and ran manually or automatically using `GitHub Actions`. In this example, we show a data quality check workflow report for a nutrition survey of children 6-59 months old.
