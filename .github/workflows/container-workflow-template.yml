@@ -24,7 +24,7 @@ jobs:
     #runs-on: [self-hosted, linux, x64, onprem-aegypti]   # Run the workflow on EHA aegypti runner
     #runs-on: [self-hosted, linux, x64, onprem-prospero]  # Run the workflow on EHA prospero runner
     container:
-      image: rocker/verse:4.1.2
+      image: rocker/tidyverse:4.1.2
       
     steps:
       - uses: actions/checkout@v2
@@ -36,24 +36,12 @@ jobs:
           libssl-dev
           
       - name: Install packages from renv.lock (with cache)
-        if: ${{ !env.ACT }}  ## Doesn't work locally with ACT
         uses: r-lib/actions/setup-renv@v2
         with:
           cache-version: 2
 
-      - name: Install packages from renv.lock (local, no cache)
-        if: ${{ env.ACT }}  ## Only locally with ACT, use `act -r` to reuse containers, effectively caching locally
-        run: |
-          renv::restore()
-        shell: Rscript {0}
-        
       - name: Run targets workflow
         run: |
           targets::tar_make()
         shell: Rscript {0}
-        
-      - name: On failure, launch a temporary interactive debugging session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ failure() }}
-        timeout-minutes: 15
       
