@@ -6,7 +6,7 @@
 
 # Load packages (in packages.R) and load project-specific functions in R folder
 suppressPackageStartupMessages(source("packages.R"))
-for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
+for (f in list.files(here::here("R"), full.names = TRUE)) source(f)
 
 # Set build options ------------------------------------------------------------
 
