@@ -4,9 +4,6 @@
 .Ruserdata
 .DS_Store
 _targets/
-outputs/
-!outputs/.gitkeep
-!outputs/example_report.html
 data/
 !data/.gitkeep
 
